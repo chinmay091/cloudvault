@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build output
+**/dist
+**/*.tsbuildinfo
+
+# Development files
+**/*.log
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Tests
+**/*.test.ts
+**/*.spec.ts
+**/coverage
+
+# Documentation
+*.md
+!README.md
+docs
+
+# LocalStack data
+localstack_data
+
+# Prisma migrations (only schema needed)
+**/prisma/migrations
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log

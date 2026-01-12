@@ -1,0 +1,155 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// ORGANIZATIONS & API KEYS
+// Multi-tenant support - each client app gets an organization
+// ============================================================================
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  
+  // Relationships
+  apiKeys   ApiKey[]
+  files     File[]
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ApiKey {
+  id             String       @id @default(cuid())
+  
+  // The actual key prefix shown to user (first 8 chars)
+  keyPrefix      String       @unique
+  
+  // Hashed version of the full key (for verification)
+  hashedKey      String
+  
+  // Human-readable name for this key
+  name           String
+  
+  // Owner organization
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Permissions: ["upload", "read", "delete", "admin"]
+  permissions    String[]
+  
+  // Optional expiration
+  expiresAt      DateTime?
+  
+  // Usage tracking
+  lastUsedAt     DateTime?
+  
+  // Timestamps
+  createdAt      DateTime     @default(now())
+  
+  @@index([organizationId])
+}
+
+// ============================================================================
+// FILES
+// Core file metadata and state tracking
+// ============================================================================
+
+model File {
+  id              String     @id @default(cuid())
+  
+  // Owner organization
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Storage location
+  bucket          String
+  key             String     @unique      // S3 object key
+  
+  // Original file info
+  originalName    String
+  mimeType        String
+  size            BigInt                  // File size in bytes
+  
+  // Integrity
+  checksum        String?                 // SHA-256 hash (set after upload)
+  
+  // Processing state machine
+  status          FileStatus @default(PENDING_UPLOAD)
+  processingState Json?                   // Detailed processing info
+  
+  // Extracted & custom metadata
+  metadata        Json?                   // Extracted metadata (page count, dimensions, etc.)
+  tags            String[]                // User-defined tags
+  
+  // Tracking
+  uploadedBy      String?                 // API key ID that requested upload
+  
+  // Timestamps
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  
+  // Relationships
+  auditLogs       AuditLog[]
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum FileStatus {
+  PENDING_UPLOAD  // Upload URL generated, waiting for file
+  UPLOADED        // File uploaded to S3, waiting for processing
+  PROCESSING      // Worker is processing the file
+  PROCESSED       // Processing complete, file ready
+  FAILED          // Processing failed
+  DELETED         // Soft deleted
+}
+
+// ============================================================================
+// AUDIT LOGS
+// Immutable record of all file operations
+// ============================================================================
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  
+  // Related file (optional, some actions are file-independent)
+  fileId         String?
+  file           File?    @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  
+  // Organization context
+  organizationId String
+  
+  // Action details
+  action         String   // upload_requested, uploaded, processed, deleted, accessed
+  actor          String   // API key ID or "system"
+  
+  // Request context
+  ipAddress      String?
+  userAgent      String?
+  
+  // Additional details (varies by action)
+  details        Json?
+  
+  // Correlation ID for tracing
+  correlationId  String?
+  
+  // Timestamp (immutable)
+  createdAt      DateTime @default(now())
+  
+  @@index([fileId])
+  @@index([organizationId])
+  @@index([correlationId])
+  @@index([createdAt])
+  @@index([action])
+}

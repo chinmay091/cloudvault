@@ -1,0 +1,32 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build --workspace=@cloudvault/shared
+
+      - run: cd packages/api && npx prisma generate
+
+      - run: npm run typecheck --if-present
+
+      - run: npm run lint --if-present
+        continue-on-error: true

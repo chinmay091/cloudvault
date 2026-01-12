@@ -1,0 +1,21 @@
+{
+    "name": "@cloudvault/worker",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@cloudvault/shared": "*",
+        "@prisma/client": "^5.22.0",
+        "bullmq": "^5.0.0",
+        "ioredis": "^5.3.0"
+    },
+    "devDependencies": {
+        "tsx": "^4.7.0",
+        "typescript": "^5.3.3",
+        "pino-pretty": "^10.3.0"
+    }
+}
