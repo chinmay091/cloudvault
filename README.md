@@ -1,6 +1,6 @@
 # CloudVault
 
-A secure, multi-tenant file storage API with S3-compatible storage and background processing.
+A secure, multi-tenant file storage API with Cloudflare R2 storage and background processing.
 
 ![Node.js](https://img.shields.io/badge/Node.js-20-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
