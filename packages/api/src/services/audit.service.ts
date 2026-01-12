@@ -43,7 +43,7 @@ export async function createAuditLog(params: AuditLogParams): Promise<void> {
         actor: params.actor,
         ipAddress: params.ipAddress,
         userAgent: params.userAgent,
-        details: params.details ?? undefined,
+        details: params.details as object | undefined,
         correlationId: params.correlationId,
       },
     });
