@@ -12,6 +12,9 @@
     "@aws-sdk/s3-request-presigner": "^3.600.0",
     "@cloudvault/shared": "*",
     "@prisma/client": "^5.22.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
     "bullmq": "^5.66.5",
     "cors": "^2.8.5",
     "express": "^4.19.2",
@@ -20,14 +23,11 @@
     "nanoid": "^5.0.0",
     "pino": "^8.17.0",
     "pino-pretty": "^10.3.0",
+    "typescript": "^5.3.3",
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.10.0",
     "prisma": "^5.22.0",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "tsx": "^4.7.0"
   }
 }
